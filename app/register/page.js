@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import API from "@/lib/api"
+import API from "../../utils/api"
 
 export default function Register(){
 
