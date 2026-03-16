@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import API from "@/lib/api"
 
 export default function Login(){
 
@@ -19,19 +20,20 @@ setForm({...form,[e.target.name]:e.target.value})
 const handleSubmit = async(e)=>{
 e.preventDefault()
 
-const res = await fetch("http://localhost:5000/api/auth/login",{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify(form)
-})
+try{
 
-const data = await res.json()
+const res = await API.post("/api/auth/login",form)
 
-localStorage.setItem("token",data.token)
+localStorage.setItem("token",res.data.token)
 
 router.push("/dashboard")
+
+}catch(error){
+
+console.error("Login failed:",error)
+alert("Invalid credentials")
+
+}
 
 }
 
@@ -48,6 +50,7 @@ name="email"
 placeholder="Email"
 onChange={handleChange}
 className="border p-2 w-full mb-3"
+required
 />
 
 <input
@@ -56,6 +59,7 @@ type="password"
 placeholder="Password"
 onChange={handleChange}
 className="border p-2 w-full mb-3"
+required
 />
 
 <button className="bg-green-500 text-white w-full p-2 rounded">

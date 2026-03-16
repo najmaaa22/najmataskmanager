@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import API from "@/lib/api"
 
 export default function Register(){
 
@@ -20,22 +21,20 @@ setForm({...form,[e.target.name]:e.target.value})
 const handleSubmit = async(e)=>{
 e.preventDefault()
 
-const res = await fetch(
-`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`,
-{
-  method:"POST",
-  headers:{
-    "Content-Type":"application/json"
-  },
-  credentials:"include",
-  body:JSON.stringify(form)
-})
+try{
 
-const data = await res.json()
+const res = await API.post("/api/auth/register",form)
 
-alert(data.message)
+alert(res.data.message)
 
 router.push("/login")
+
+}catch(error){
+
+console.error("Registration failed:",error)
+alert("Registration failed")
+
+}
 
 }
 
@@ -52,6 +51,7 @@ name="name"
 placeholder="Name"
 onChange={handleChange}
 className="border p-2 w-full mb-3"
+required
 />
 
 <input
@@ -59,6 +59,7 @@ name="email"
 placeholder="Email"
 onChange={handleChange}
 className="border p-2 w-full mb-3"
+required
 />
 
 <input
@@ -67,6 +68,7 @@ type="password"
 placeholder="Password"
 onChange={handleChange}
 className="border p-2 w-full mb-3"
+required
 />
 
 <button className="bg-blue-500 text-white w-full p-2 rounded">
