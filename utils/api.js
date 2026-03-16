@@ -1,7 +1,7 @@
 import axios from "axios"
 
 const API = axios.create({
-  baseURL: "https://taskmanager-backend-1rgj.onrender.com/api",
+  baseURL: process.env.NEXT_PUBLIC_API_UR,
   withCredentials: true
 })
 
