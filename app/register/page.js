@@ -21,7 +21,7 @@ const handleSubmit = async(e)=>{
 e.preventDefault()
 
 const res = await fetch(
-  "https://taskmanager-backend-1rgj.onrender.com/api/auth/register",
+  "https://taskmanager-backend-1rgj.onrender.com/auth/register",
   {
     method: "POST",
     headers: {
