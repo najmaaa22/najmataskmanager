@@ -21,16 +21,15 @@ const handleSubmit = async(e)=>{
 e.preventDefault()
 
 const res = await fetch(
-  "https://taskmanager-backend-1rgj.onrender.com/api/auth/register",
-  {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    credentials: "include",
-    body: JSON.stringify(form)
-  }
-)
+`${process.env.PUBLIC_URL}/api/auth/register`,
+{
+  method:"POST",
+  headers:{
+    "Content-Type":"application/json"
+  },
+  credentials:"include",
+  body:JSON.stringify(form)
+})
 
 const data = await res.json()
 
