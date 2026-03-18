@@ -4,72 +4,102 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import API from "../../utils/api"
 
-export default function Login(){
+export default function Login() {
 
-const router = useRouter()
+  const router = useRouter()
 
-const [form,setForm] = useState({
-email:"",
-password:""
-})
+  const [form, setForm] = useState({
+    email: "",
+    password: ""
+  })
 
-const handleChange = (e)=>{
-setForm({...form,[e.target.name]:e.target.value})
-}
+  const [loading, setLoading] = useState(false)
 
-const handleSubmit = async(e)=>{
-e.preventDefault()
+  const handleChange = (e) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value
+    })
+  }
 
-try{
+  const handleSubmit = async (e) => {
+    e.preventDefault()
 
-const res = await API.post("/api/auth/login",form)
+    console.log("Form Data:", form) // ✅ DEBUG
 
-localStorage.setItem("token",res.data.token)
+    try {
 
-router.push("/dashboard")
+      setLoading(true)
 
-}catch(error){
+      const res = await API.post(
+        "/api/v1/auth/login",
+        form,
+        {
+          withCredentials: true
+        }
+      )
 
-console.error("Login failed:",error)
-alert("Invalid credentials")
+      console.log("Login Success:", res.data)
 
-}
+      alert("Login successful")
 
-}
+      router.push("/dashboard")
 
-return(
+    } catch (error) {
 
-<div className="flex items-center justify-center h-screen bg-gray-100">
+      console.log("ERROR:", error.response?.data || error.message)
 
-<form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow w-80">
+      alert(
+        error.response?.data?.message || "Login failed"
+      )
 
-<h2 className="text-2xl mb-4 text-center">Login</h2>
+    } finally {
+      setLoading(false)
+    }
+  }
 
-<input
-name="email"
-placeholder="Email"
-onChange={handleChange}
-className="border p-2 w-full mb-3"
-required
-/>
+  return (
 
-<input
-name="password"
-type="password"
-placeholder="Password"
-onChange={handleChange}
-className="border p-2 w-full mb-3"
-required
-/>
+    <div className="flex items-center justify-center h-screen bg-gray-100">
 
-<button className="bg-green-500 text-white w-full p-2 rounded">
-Login
-</button>
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-6 rounded shadow w-80"
+      >
 
-</form>
+        <h2 className="text-2xl mb-4 text-center">
+          Login
+        </h2>
 
-</div>
+        <input
+          name="email"
+          type="email"
+          placeholder="Email"
+          value={form.email}
+          onChange={handleChange}
+          className="border p-2 w-full mb-3"
+          required
+        />
 
-)
+        <input
+          name="password"
+          type="password"
+          placeholder="Password"
+          value={form.password}
+          onChange={handleChange}
+          className="border p-2 w-full mb-3"
+          required
+        />
 
+        <button
+          disabled={loading}
+          className="bg-green-500 text-white w-full p-2 rounded"
+        >
+          {loading ? "Logging in..." : "Login"}
+        </button>
+
+      </form>
+
+    </div>
+  )
 }
