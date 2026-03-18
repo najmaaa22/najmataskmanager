@@ -2,70 +2,104 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import API from "../../utils/api"
 
-export default function Login(){
+export default function Login() {
 
-const router = useRouter()
+  const router = useRouter()
 
-const [form,setForm] = useState({
-email:"",
-password:""
-})
+  const [form, setForm] = useState({
+    email: "",
+    password: ""
+  })
 
-const handleChange = (e)=>{
-setForm({...form,[e.target.name]:e.target.value})
-}
+  const [loading, setLoading] = useState(false)
 
-const handleSubmit = async(e)=>{
-e.preventDefault()
+  const handleChange = (e) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value
+    })
+  }
 
-const res = await fetch("http://localhost:5000/api/auth/login",{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify(form)
-})
+  const handleSubmit = async (e) => {
+    e.preventDefault()
 
-const data = await res.json()
+    console.log("Form Data:", form) // ✅ DEBUG
 
-localStorage.setItem("token",data.token)
+    try {
 
-router.push("/dashboard")
+      setLoading(true)
 
-}
+      const res = await API.post(
+        "/api/v1/auth/login",
+        form,
+        {
+          withCredentials: true
+        }
+      )
 
-return(
+      console.log("Login Success:", res.data)
 
-<div className="flex items-center justify-center h-screen bg-gray-100">
+      alert("Login successful")
 
-<form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow w-80">
+      router.push("/dashboard")
 
-<h2 className="text-2xl mb-4 text-center">Login</h2>
+    } catch (error) {
 
-<input
-name="email"
-placeholder="Email"
-onChange={handleChange}
-className="border p-2 w-full mb-3"
-/>
+      console.log("ERROR:", error.response?.data || error.message)
 
-<input
-name="password"
-type="password"
-placeholder="Password"
-onChange={handleChange}
-className="border p-2 w-full mb-3"
-/>
+      alert(
+        error.response?.data?.message || "Login failed"
+      )
 
-<button className="bg-green-500 text-white w-full p-2 rounded">
-Login
-</button>
+    } finally {
+      setLoading(false)
+    }
+  }
 
-</form>
+  return (
 
-</div>
+    <div className="flex items-center justify-center h-screen bg-gray-100">
 
-)
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-6 rounded shadow w-80"
+      >
 
+        <h2 className="text-2xl mb-4 text-center">
+          Login
+        </h2>
+
+        <input
+          name="email"
+          type="email"
+          placeholder="Email"
+          value={form.email}
+          onChange={handleChange}
+          className="border p-2 w-full mb-3"
+          required
+        />
+
+        <input
+          name="password"
+          type="password"
+          placeholder="Password"
+          value={form.password}
+          onChange={handleChange}
+          className="border p-2 w-full mb-3"
+          required
+        />
+
+        <button
+          disabled={loading}
+          className="bg-green-500 text-white w-full p-2 rounded"
+        >
+          {loading ? "Logging in..." : "Login"}
+        </button>
+
+      </form>
+
+    </div>
+  )
 }

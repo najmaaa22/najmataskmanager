@@ -2,78 +2,87 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import API from "../../utils/api"
 
-export default function Register(){
+export default function Register() {
 
-const router = useRouter()
+ const router = useRouter()
 
-const [form,setForm] = useState({
-name:"",
-email:"",
-password:""
-})
+ const [form, setForm] = useState({
+  name: "",
+  email: "",
+  password: ""
+ })
 
-const handleChange = (e)=>{
-setForm({...form,[e.target.name]:e.target.value})
-}
+ // ✅ MAKE SURE THIS FUNCTION EXISTS
+ const handleChange = (e) => {
+  setForm({
+   ...form,
+   [e.target.name]: e.target.value
+  })
+ }
 
-const handleSubmit = async(e)=>{
-e.preventDefault()
+ const handleSubmit = async (e) => {
+  e.preventDefault()
 
-const res = await fetch("http://localhost:5000/api/auth/register",{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify(form)
-})
+  try {
 
-const data = await res.json()
+   const res = await API.post("/api/v1/auth/register", form, {
+    withCredentials: true
+   })
 
-alert(data.message)
+   alert(res.data.message)
 
-router.push("/login")
+   router.push("/login")
 
-}
+  } catch (error) {
 
-return(
+   console.error("Registration failed:", error)
+   alert("Registration failed")
 
-<div className="flex items-center justify-center h-screen bg-gray-100">
+  }
+ }
 
-<form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow w-80">
+ return (
 
-<h2 className="text-2xl mb-4 text-center">Register</h2>
+  <div className="flex items-center justify-center h-screen bg-gray-100">
 
-<input
-name="name"
-placeholder="Name"
-onChange={handleChange}
-className="border p-2 w-full mb-3"
-/>
+   <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow w-80">
 
-<input
-name="email"
-placeholder="Email"
-onChange={handleChange}
-className="border p-2 w-full mb-3"
-/>
+    <h2 className="text-2xl mb-4 text-center">Register</h2>
 
-<input
-name="password"
-type="password"
-placeholder="Password"
-onChange={handleChange}
-className="border p-2 w-full mb-3"
-/>
+    <input
+     name="name"
+     placeholder="Name"
+     onChange={handleChange}
+     className="border p-2 w-full mb-3"
+     required
+    />
 
-<button className="bg-blue-500 text-white w-full p-2 rounded">
-Register
-</button>
+    <input
+     name="email"
+     placeholder="Email"
+     onChange={handleChange}
+     className="border p-2 w-full mb-3"
+     required
+    />
 
-</form>
+    <input
+     name="password"
+     type="password"
+     placeholder="Password"
+     onChange={handleChange}
+     className="border p-2 w-full mb-3"
+     required
+    />
 
-</div>
+    <button className="bg-blue-500 text-white w-full p-2 rounded">
+     Register
+    </button>
 
-)
+   </form>
 
+  </div>
+
+ )
 }
